@@ -1,0 +1,58 @@
+# /docker-compose.yml
+
+version: '3.8'
+
+services:
+  # API Service (NestJS)
+  api:
+    build:
+      context: ./task_management_api
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000' # Expose API port to host
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - app-network
+    restart: unless-stopped
+    # This command chain first applies database migrations
+    # and then starts the NestJS server.
+    command: sh -c "npx prisma migrate deploy && node dist/src/main"
+
+
+  # Frontend Service (React)
+  client:
+    build:
+      context: ./task_management_front_end
+      dockerfile: Dockerfile
+    ports:
+      - '8080:80' # Map host port 8080 to container port 80
+    depends_on:
+      - api
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Database Service (MySQL)
+  db:
+    image: mysql:8.0
+    env_file:
+      - .env
+    ports:
+      - '3307:3306' # Expose DB port to host
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    restart: unless-stopped
+
+# Volumes for data persistence
+volumes:
+  mysql_data:
+
+# Network for services communication
+networks:
+  app-network:
+    driver: bridge

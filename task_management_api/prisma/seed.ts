@@ -5,14 +5,33 @@ import { BoardRelations } from 'src/_gen/prisma-class/board_relations';
 
 const prisma = new PrismaClient();
 
+async function checkForExistingData() {
+  const [boards, columns, tasks, subTasks] = await Promise.all([
+    prisma.board.findFirst(),
+    prisma.column.findFirst(),
+    prisma.task.findFirst(),
+    prisma.subTask.findFirst(),
+  ]);
+
+  if (boards || columns || tasks || subTasks) {
+    console.log('Database already contains data. Aborting seed.');
+    return true;
+  }
+  return false;
+}
+
 async function main() {
-  // Clean existing data
+  const hasData = await checkForExistingData();
+  if (hasData) {
+    await prisma.$disconnect();
+    process.exit(0);
+  }
+
   await prisma.subTask.deleteMany();
   await prisma.task.deleteMany();
   await prisma.column.deleteMany();
   await prisma.board.deleteMany();
 
-  // Create boards
   const boardNames = ['Platform Launch', 'Marketing Plan', 'Roadmap'];
   const boards: (Board & BoardRelations)[] = [];
 
@@ -31,20 +50,18 @@ async function main() {
     boards.push(board);
   }
 
-  // For each column, create tasks
   for (const board of boards) {
     for (const column of board.columns) {
       const tasks = await prisma.task.createMany({
-        data: generateTasks(column.id, 3), // Create 3 tasks per column
+        data: generateTasks(column.id, 3),
       });
     }
   }
 
-  // Get all tasks and create subtasks for them
   const allTasks = await prisma.task.findMany();
   for (const task of allTasks) {
     await prisma.subTask.createMany({
-      data: generateSubTasks(task.id, 2), // Create 2 subtasks per task
+      data: generateSubTasks(task.id, 2),
     });
   }
 
