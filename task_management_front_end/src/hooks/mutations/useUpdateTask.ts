@@ -10,7 +10,10 @@ export const useUpdateTask = () => {
   return useMutation({
     mutationFn: taskService.updateTask,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["boards", activeBoardId] });
+      queryClient.invalidateQueries({
+        queryKey: ["boards", activeBoardId],
+        exact: true,
+      });
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
     onError: (error) => {

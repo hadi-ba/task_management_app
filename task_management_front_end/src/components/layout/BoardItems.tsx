@@ -51,10 +51,10 @@ const BoardItems = ({ onSelectItem }: { onSelectItem?: () => void }) => {
               className={`
               flex items-center h-12 gap-3 px-6 py-3.5 cursor-pointer rounded-tr-[100px] rounded-br-[100px] active:bg-main-purple/10 active:dark:bg-white active:text-main-purple
               ${
-                  board.id === activeBoardId
+                board.id === activeBoardId
                   ? "bg-main-purple text-white"
                   : "text-medium-grey"
-                }
+              }
               `}
               onMouseDown={() => setPressedBoardId(board.id)}
               onMouseUp={() => setPressedBoardId(null)}

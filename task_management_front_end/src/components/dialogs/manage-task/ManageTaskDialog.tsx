@@ -34,8 +34,6 @@ const ManageTaskDialog = ({
   const [subtasks, setSubtasks] = useState<string[]>([""]);
   const [status, setStatus] = useState("");
 
-  console.log("STATUS", status);
-
   const [errors, setErrors] = useState<{
     title?: string;
     subtasks?: { [key: number]: string };

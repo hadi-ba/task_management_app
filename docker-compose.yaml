@@ -9,7 +9,7 @@ services:
       context: ./task_management_api
       dockerfile: Dockerfile
     ports:
-      - '3000:3000' # Expose API port to host
+      - '3000:3000' # Expose API port to host (host:container)
     env_file:
       - .env
     depends_on:

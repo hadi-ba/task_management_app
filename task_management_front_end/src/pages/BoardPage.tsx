@@ -1,25 +1,15 @@
 import Column from "@/components/column/Column";
 import ManageColumnDialog from "@/components/dialogs/manage-column/ManageColumnDialog";
-import ColumnsSkeleton from "@/components/skeletons/ColumnsSkeleton";
-import { useBoardDetails } from "@/hooks/queries/useBoards";
 import { useActiveBoard } from "@/providers/BoardProvider";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const BoardPage = () => {
-  const { activeBoardId, updateActiveBoard } = useActiveBoard();
-
-  const { data: boardDetils, isFetching } = useBoardDetails(activeBoardId);
+  const { activeBoard } = useActiveBoard();
 
   const [openAddColumnDialog, setOpenAddColumnDialog] = useState(false);
 
-  useEffect(() => {
-    if (boardDetils) {
-      updateActiveBoard(boardDetils);
-    }
-  }, [boardDetils]);
-
   const content = () => {
-    if (!boardDetils) {
+    if (!activeBoard) {
       return (
         <div className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] w-full mx-auto flex flex-col justify-center items-center gap-6 px-4">
           <h1 className="heading-l text-medium-grey text-center">
@@ -27,7 +17,7 @@ const BoardPage = () => {
           </h1>
         </div>
       );
-    } else if (boardDetils && boardDetils.columns.length === 0) {
+    } else if (activeBoard && activeBoard.columns.length === 0) {
       return (
         <div className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] w-full mx-auto flex flex-col justify-center items-center gap-6 px-4">
           <h1 className="heading-l text-medium-grey text-center">
@@ -45,12 +35,10 @@ const BoardPage = () => {
           </button>
         </div>
       );
-    } else if (isFetching) {
-      return <ColumnsSkeleton />;
     } else {
       return (
         <div className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] flex gap-6 px-4 py-6 overflow-auto">
-          {boardDetils?.columns?.map((column) => (
+          {activeBoard?.columns?.map((column) => (
             <Column
               key={column.id}
               id={column.id}
